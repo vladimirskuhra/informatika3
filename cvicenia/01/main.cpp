@@ -5,7 +5,7 @@ int main()
 {
     std::cout << "Ahoj svet\n"; // alebo std::cout << "Ahoj svet" << "\n";
     double a;
-    std::cout << "Zadaj reálne číslo:"
+    std::cout << "Zadaj reálne číslo:";
     std::cin >> a;
     std::cout << "Zadal si: " << a << "\n";
     double sr = std::sqrt(a);
