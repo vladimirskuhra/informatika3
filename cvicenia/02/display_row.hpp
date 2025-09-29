@@ -14,7 +14,7 @@ namespace asciid
         //konstruktor
         DisplayRow();
         //getter
-        std::uint8_t getPixelCount();
+        std::uint8_t getPixelCount() const;
         //int getPixelCount() const; // int je typ premennej ktory ma 4 Bajty
         void turnPixelOn(int i);
 

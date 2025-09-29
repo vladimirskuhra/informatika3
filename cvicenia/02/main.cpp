@@ -2,6 +2,6 @@
 #include <iostream>
 int main() {
     asciid::DisplayRow *row = new asciid::DisplayRow();
-    std::cout << row->getPixelCount() << "\n";
+    //std::cout << row->getPixelCount() << "\n";
     delete row;
 }
