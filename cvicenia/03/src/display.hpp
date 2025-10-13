@@ -7,11 +7,13 @@ namespace asciid {
 
 class Display {
 public:
-    static const int N_ROWS = 8;
-    static const int N_COLS = 8;
-    Display();
-    ~Display();
-
+    Display(); //konstrkutor
+    ~Display(); //destruktor
+    /*
+    destruktor - uvlonuje pamat, vola sa automaticky, 
+        - zabranuje unikom pamate, 
+        - vola sa pri konci programu alebo ked objekt zanika
+    */
     int getRowCount() const;
     int getColCount() const;
 
@@ -26,8 +28,12 @@ public:
 
     void print() const;
     void printRowIn(int row) const;
-
 private:
+    static const int N_ROWS = 8;
+    static const int N_COLS = 8;
+private:
+    /* prakticky rozdiel medzi DisplayRow* m_rows[N_ROWS] a DisplayRow *m_rows[N_ROWS] NIE JE 
+     */
     DisplayRow* m_rows[N_ROWS];
     bool boundCheck(int row, int col) const;
 };

@@ -45,7 +45,12 @@ void Display::flipPixel(int row, int col) {
         m_rows[row]->flipPixel(col);
     }
 }
-
+/*
+? - tzv. ternarny operator je skrateny zapis if-else,
+mam napriklad a ? b : c; 
+ak je podmienka a splnena, 
+vykona/vrati b ak nie je splnena vykona/vrati c
+*/
 bool Display::isPixelOn(int row, int col) const {
     return boundCheck(row, col) ? m_rows[row]->isPixelOn(col) : false;
 }

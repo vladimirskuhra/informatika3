@@ -8,8 +8,7 @@ void Terminal::clear() {
 }
 
 void Terminal::setTextColor(Color c) {
-    int code = 30 + static_cast<int>(c);
-    std::cout << "\033[" << code << "m";
+    std::cout << "\033[" << static_cast<int>(c) << "m";
 }
 
 void Terminal::resetTextColor() {
