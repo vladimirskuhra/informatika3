@@ -1,0 +1,28 @@
+#include <iostream>
+//#include <cstdint>
+#include <string>
+#include <functional>
+#include <vector>
+
+/*void vypisHodnotu(const int* pc){
+    if (pc != nullptr)
+    {
+        std::cout << *pc << "\n";
+    } else {
+        std::cout << "Neplatny ukazovatel\n";
+    }
+}*/
+
+int main(){
+    /* int c = 10;
+    //char d = 'C';
+
+    int* pc = &c;
+    //char *pd = &d;
+    int* pe = nullptr;
+
+    vypisHodnotu(pc);
+    //vypisHodnotu(pd) << "\n";
+    vypisHodnotu(pe);*/
+    return 0; 
+}

@@ -1,0 +1,21 @@
+#include <iostream>
+//#include <cstdint>
+#include <string>
+#include <functional>
+#include <vector>
+
+/*int sucet(const int* pa, const int* pb){
+    int vysledok = *pa + *pb;
+    return vysledok;
+}*/
+
+int main(){
+    /*int a = 10;
+    int b = 5;
+
+    int* pa = &a;
+    int* pb = &b;
+
+    std::cout << "Vysledok je: " << sucet(pa, pb);*/
+    return 0; 
+}
