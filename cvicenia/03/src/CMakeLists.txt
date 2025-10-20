@@ -1,15 +1,15 @@
-add_executable(asciid)
-
-target_sources(asciid PUBLIC
-    display_row.cpp
+add_executable(main
     main.cpp
+    game_of_life.cpp
     display.cpp
-    terminal.cpp
+    display_row.cpp
     filters.cpp
     heap_monitor.cpp
+    terminal.cpp
+    ui_utils.cpp
 )
 
-target_compile_options(asciid PUBLIC
+target_compile_options(main PUBLIC
     -Wall
     -Wextra
     -Wpedantic
