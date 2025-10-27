@@ -112,7 +112,6 @@ void Interpreter::interpterSubtreeNodes(Node *node, Turtle &turtle)
         if (command != nullptr) {
             command->execute(turtle);
         }
-        node->toString();
         const std::vector<Node *>& subnodes = node->getSubnodes();
         for (Node* subnode : subnodes) {
             this->interpterSubtreeNodes(subnode, turtle);
