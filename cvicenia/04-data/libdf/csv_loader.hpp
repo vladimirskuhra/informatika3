@@ -14,7 +14,7 @@ namespace df {
         public:
             CSVLoader(CSVConfig config);
             DataFrame<T> load(const std::filesystem::path &path) const override;
-            virtual T create(const csv::CSVRow &row) const;
+            virtual T create(const csv::CSVRow &row) const = 0;
         private:
             CSVConfig m_config;
     };

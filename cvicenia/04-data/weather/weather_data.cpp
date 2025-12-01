@@ -22,9 +22,15 @@ namespace weather {
         record.temp0700 = row["t_0700"].get<float>();
         record.temp1400 = row["t_1400"].get<float>();
         record.temp2100 = row["t_2100"].get<float>();
-        record.elevation = row["elevation"].get<int>();
-        record.date = *dateOpt;
+        
+        if (row["nadmorska_vyska"].is_null()) {
+        record.elevation = 0;
+        } else {
+            record.elevation = row["nadmorska_vyska"].get<int>();
+        }
 
+        record.date = *dateOpt;
+        
         return record;
     }
 
