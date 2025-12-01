@@ -14,6 +14,7 @@ namespace df {
             DataFrame(std::vector<T> data);
             void print(std::ostream &ost) const;
             size_t size() const;
+            void print() const;
 
         private:
             std::vector<T> m_data;  
@@ -28,9 +29,15 @@ namespace df {
     }
 
     template <typename T>
-    /*inline*/ void DataFrame<T>::print(std::ostream &ost) const /*inline na zaciatok v tomto pripade netreba pisat */
+    void DataFrame<T>::print(std::ostream &ost) const
     {
-        //void(ost); //aby sme sa zbavili varovania/warningu o nepouzitej premennej
+        for (const auto &item : m_data)
+            ost << item << "\n";
+    }
+
+    template <typename T>
+    void df::DataFrame<T>::print() const {
+        print(std::cout);
     }
 
     template <typename T>
