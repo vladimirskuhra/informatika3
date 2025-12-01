@@ -1,0 +1,18 @@
+InlayHints:
+  ParameterNames: false
+  DeducedTypes: false
+
+Completion:
+  AllScopes: No
+  ArgumentLists: Delimiters
+  HeaderInsertion: Never
+  CodePatterns: None
+
+CompileFlags:
+  Add:
+    - "--target=x86_64-w64-windows-gnu"
+    - "-stdlib=libstdc++"
+
+Diagnostics:
+  Suppress:
+    - ".*__rdtsc.*"

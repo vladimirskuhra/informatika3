@@ -12,21 +12,12 @@ class ICommand;
 
 class Node {
 public:
-    /**
-     * Inicializuje vrchol bez príkazu.
-     */
-    Node();
 
-    /**
-     * Inicializuje vrchol s príkazom.
-     */
-    Node(ICommand *command);
+    static Node* createLeafNode(ICommand *command);
+    static Node *createSequentialNode();
 
-    /**
-     * Odstráni synov vrcholu.
-     */
-    ~Node();
 
+    
     /*
      * Vráti reťazec reprezentujúci vrchol.
      * Ak vrchol nemá priradený command, vráti "No command".
@@ -46,10 +37,26 @@ public:
 
     ICommand *getCommand() const;
 
+    Cursor *getCursor() const;
+    void setIsFocused(bool focused);
+    bool isFocused() const;
+
+    /**
+     * Odstráni synov vrcholu.
+     */
+    ~Node();
+
+
 private:
+    /**
+     * Inicializuje vrchol s príkazom.
+     */
+    Node(ICommand *command, Cursor *cursor);
     ICommand *m_command;
+    Cursor *m_cursor;
     Node *m_parent;
     std::vector<Node *> m_subnodes;
+    bool m_isFocused = false;
 };
 
 // ==================================================
@@ -124,18 +131,65 @@ class Interpreter {
 public:
     Interpreter(Node *root);
 
-    /**
-     * Rekurzívnou prehliadkou interpretuje príkazy
-     * vo všetkých vrcholoch.
-     */
+    // Execute a single step (current node) and advance the interpreter.
+    void interpretStep(Turtle &turtle);
+
+    // Interpret entire tree (reset + run until finished).
     void interpretAll(Turtle &turtle);
+
+    // Reset interpreter state (cursors, flags, current node).
+    void reset();
+
+    bool isFinished() const;
+    bool wasSomethingExecuted() const;
+
+    bool stopOnNodeWithoutCommand() const;
+    void setStopOnNodeWithoutCommand(bool val);
 
     Node *getRoot() const;
 
 private:
     Node *m_root;
+    Node *m_current;
+    bool m_somethingExecuted;
+    bool m_stopOnNodeWithoutCommand;
 
-    void interpterSubtreeNodes(Node *node, Turtle &turtle);
+    // Advance m_current according to current node's cursor logic.
+    void moveCurrent();
+};
+
+class Cursor {
+public:
+    Cursor() : m_node(nullptr) {}
+    virtual ~Cursor() = default;
+
+    void setNode(Node *node) { m_node = node; }
+    Node *getNode() const { return m_node; }
+
+    virtual Node* next() = 0;
+    virtual void reset() = 0;
+    virtual std::string toString() = 0;
+
+protected:
+    Node *m_node;
+};
+
+class CursorUp : public Cursor {
+public:
+    Node* next() override;
+    void reset() override {}
+    std::string toString() override { return "Up"; }
+};
+
+class SequentialCursor : public Cursor {
+public:
+    SequentialCursor() : m_current(-1) {}
+    Node* next() override;
+    void reset() override;
+    std::string toString() override;
+
+private:
+    int m_current;
 };
 
 } // namespace turtlepreter

@@ -11,30 +11,38 @@ namespace turtlepreter {
 
 Turtle::Turtle(const std::string &imgPath) :
     m_transformation(),
-    m_image(friimgui::Image::createImage(imgPath)) {
+    m_image(friimgui::Image::createImage(imgPath)) 
+{
+    m_initPos = m_transformation.translation.getValueOrDef();
+    m_initAngle = m_transformation.rotation.getValueOrDef();
 }
 
 Turtle::Turtle(const std::string &imgPath, float centerX, float centerY) :
-    Turtle(imgPath) {
-    m_transformation.translation.setValue({centerX, centerY});
+    Turtle(imgPath) 
+{
+    const ImVec2 center(centerX, centerY);
+    m_transformation.translation.setValue(center);
+    m_initPos = center;
+    m_initAngle = 0.f;
 }
 
 void Turtle::draw(const friimgui::Region &region) {
-    const float thickness = 1;
+    const float thickness = 2.0f;
     const ImColor color = ImColor(ImVec4({0, 1, 0, 1}));
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-    const ImVec2 p0 = region.getP0();
-    // TODO
-    (void)thickness;
-    (void)color;
-    (void)drawList;
-    (void)p0;
-    // TODO
+
+    for (const auto &segment : m_path) {
+        const ImVec2 p0(segment.x, segment.y);
+        const ImVec2 p1(segment.z, segment.w);
+        drawList->AddLine(p0, p1, color, thickness);
+    }
     m_image.draw(region, m_transformation);
 }
 
 void Turtle::reset() {
-    throw std::logic_error("Not implemented yet!");
+    m_path.clear();
+    m_transformation.translation.setValue(m_initPos);
+    m_transformation.rotation.setValue(m_initAngle);
 }
 
 void Turtle::move(float distance) {
@@ -46,9 +54,8 @@ void Turtle::move(float distance) {
     float dx = distance * cosf(angle);
     float dy = distance * sinf(angle);
     ImVec2 dest(pos.x + dx, pos.y + dy);
-    // Pridaj segment do cesty
-    const ImVec4 segment(pos.x, pos.y, dest.x, dest.y);
-    m_path.push_back(segment);
+
+    m_path.push_back(ImVec4(pos.x, pos.y, dest.x, dest.y));
     // Aktualizuj pozíciu
     m_transformation.translation.setValue(dest);
 }
@@ -56,8 +63,7 @@ void Turtle::move(float distance) {
 void Turtle::jump(float x, float y) {
     const ImVec2 pos = m_transformation.translation.getValueOrDef();
     const ImVec2 dest(x, y);
-    const ImVec4 segment(pos.x, pos.y, dest.x, dest.y);
-    m_path.push_back(segment);
+    m_path.push_back(ImVec4(pos.x, pos.y, dest.x, dest.y));
     m_transformation.translation.setValue(dest);
 }
 

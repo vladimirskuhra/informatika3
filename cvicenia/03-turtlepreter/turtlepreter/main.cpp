@@ -28,18 +28,25 @@ int main(int argc, char *argv[]) {
 
     // Create the turtle.
     tp::Turtle turtle(cTurtleImg, cCenterX, cCenterY); //Objekt je ulozeny na zasobniku, nie v halde
-    turtle.jump(100, 100);
-    turtle.rotate(3.14);
     // TODO
     /*VYTVARAME STROM S NODE-mi */
-    tp::Node* n1 = new tp::Node(new tp::CommandMove(100));
-    tp::Node* n2 = new tp::Node(new tp::CommandJump(200, 300));
-    tp::Node* n3 = new tp::Node(new tp::CommandRotate(3.14));
-    n1->addSubnode(n2);
-    n1->addSubnode(n3);
+    
+    tp::Node* root = tp::Node::createSequentialNode();
 
-    // Interpret the tree from the root.
-    tp::Interpreter interpreter(n1);
+    
+    tp::Node* nodeRotate = tp::Node::createLeafNode(new tp::CommandRotate(3.14f));
+    tp::Node* nodeMove   = tp::Node::createLeafNode(new tp::CommandMove(100.f));
+    tp::Node* nodeJump   = tp::Node::createLeafNode(new tp::CommandJump(400, 200));
+    tp::Node* move2      = tp::Node::createLeafNode(new tp::CommandMove(120));
+
+    
+    root->addSubnode(nodeRotate);
+    root->addSubnode(nodeMove);
+    root->addSubnode(nodeJump);
+    root->addSubnode(move2);
+
+    
+    tp::Interpreter interpreter(root);
 
     // Create GUI.
     tp::TurtleGUI turtleGUI(&turtle, &interpreter);
@@ -48,6 +55,6 @@ int main(int argc, char *argv[]) {
     window->setGUI(&turtleGUI);
     window->run();
 
-    delete n1;//staci zavolat delete na ten koren stromu, lebo destruktor Node sa postara o zbytok
+    delete root;//staci zavolat delete na ten koren stromu, lebo destruktor Node sa postara o zbytok
     friimgui::Window::releaseWindow();
 }

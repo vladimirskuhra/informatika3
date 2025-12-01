@@ -5,6 +5,7 @@
 #include "libfriimgui/types.hpp"
 
 #include <vector>
+#include <string>
 
 namespace turtlepreter {
 
@@ -40,6 +41,8 @@ private:
     friimgui::Transformation m_transformation;
     friimgui::Image m_image;
     std::vector<ImVec4> m_path;
+    float m_initAngle = 0.f;
+    ImVec2 m_initPos = {0.f, 0.f};
 };
 
 } // namespace turtlepreter
