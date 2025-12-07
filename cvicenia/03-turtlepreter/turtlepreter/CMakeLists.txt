@@ -4,6 +4,8 @@ target_sources(turtlepreter PRIVATE
     interpreter.cpp
     turtle.cpp
     turtle_gui.cpp
+    controllable.cpp
+    perk.cpp
     main.cpp
 )
 

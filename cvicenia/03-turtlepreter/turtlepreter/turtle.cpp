@@ -1,77 +1,61 @@
 #include "turtle.hpp"
-
 #include <imgui/imgui.h>
-
 #include <cmath>
+#include "heap_monitor.hpp"
 
-#include <stdexcept>
-#include <cmath>
 
 namespace turtlepreter {
+Turtle::Turtle(const std::string& img, float cX, float cY):Controllable(img, cX, cY){}
 
-Turtle::Turtle(const std::string &imgPath) :
-    m_transformation(),
-    m_image(friimgui::Image::createImage(imgPath)) 
-{
-    m_initPos = m_transformation.translation.getValueOrDef();
-    m_initAngle = m_transformation.rotation.getValueOrDef();
-}
 
-Turtle::Turtle(const std::string &imgPath, float centerX, float centerY) :
-    Turtle(imgPath) 
-{
-    const ImVec2 center(centerX, centerY);
-    m_transformation.translation.setValue(center);
-    m_initPos = center;
-    m_initAngle = 0.f;
-}
+void Turtle::draw(const friimgui::Region &r) {
+    // 1) Nakresli obrázok cez predka (friimgui aplikuje transformáciu na image)
+    Controllable::draw(r);
 
-void Turtle::draw(const friimgui::Region &region) {
-    const float thickness = 2.0f;
-    const ImColor color = ImColor(ImVec4({0, 1, 0, 1}));
-    ImDrawList *drawList = ImGui::GetWindowDrawList();
+    // 2) Nakresli cestu (čiary) v tom istom regiónovom offsete
+    ImDrawList* dl = ImGui::GetWindowDrawList();
 
-    for (const auto &segment : m_path) {
-        const ImVec2 p0(segment.x, segment.y);
-        const ImVec2 p1(segment.z, segment.w);
-        drawList->AddLine(p0, p1, color, thickness);
+    // Ľavý horný roh kresliaceho regiónu (screen súradnice)
+    const ImVec2 p0 = r.getP0();
+
+    for (const auto& s : m_path) {
+        // s = {x1, y1, x2, y2} v „kanvas“ súradniciach; posuň ich o p0 do screen súradníc
+        const ImVec2 a = { s.x + p0.x, s.y + p0.y };
+        const ImVec2 b = { s.z + p0.x, s.w + p0.y };
+        dl->AddLine(a, b, ImColor(ImVec4(0, 1, 0, 1)), 2.0f);
     }
-    m_image.draw(region, m_transformation);
 }
 
-void Turtle::reset() {
-    m_path.clear();
-    m_transformation.translation.setValue(m_initPos);
-    m_transformation.rotation.setValue(m_initAngle);
+void Turtle::reset() { Controllable::reset(); m_path.clear(); }
+void Turtle::move(float d) { auto& t=getTransformation(); auto p=t.translation.getValueOrDef(); float a=t.rotation.getValueOrDef(); ImVec2 dest(p.x+d*cosf(a),p.y+d*sinf(a)); m_path.push_back({p.x,p.y,dest.x,dest.y}); t.translation.setValue(dest); }
+void Turtle::jump(float x,float y) { auto& t=getTransformation(); auto p=t.translation.getValueOrDef(); m_path.push_back({p.x,p.y,x,y}); t.translation.setValue({x,y});}
+
+void Turtle::rotate(float a) {
+    auto& tr = getTransformation();
+    float current = tr.rotation.getValueOrDef();
+    tr.rotation.setValue(current + a); // relatívne
+}
+Tortoise::Tortoise(const std::string& img,float cX,float cY):Controllable(img,cX,cY),Turtle(img,cX,cY),Runner(img,cX,cY){}
+void Tortoise::reset(){ Turtle::reset(); Runner::reset(); }
+
+void TurtleCommand::execute(Controllable& c) /*final*/ /*override*/ {
+    if (auto* t = dynamic_cast<Turtle*>(&c)) {
+        executeOnTurtle(*t);
+    } else {
+        // interpretér by mal prevolať canBeExecutedOn, ale aj tak je bezpečnejšie nič neházať
+    }
 }
 
-void Turtle::move(float distance) {
-    // Získaj aktuálnu pozíciu
-    const ImVec2 pos = m_transformation.translation.getValueOrDef();
-    // Získaj aktuálny uhol natočenia (v radiánoch)
-    float angle = m_transformation.rotation.getValueOrDef();
-    // Vypočítaj novú pozíciu
-    float dx = distance * cosf(angle);
-    float dy = distance * sinf(angle);
-    ImVec2 dest(pos.x + dx, pos.y + dy);
-
-    m_path.push_back(ImVec4(pos.x, pos.y, dest.x, dest.y));
-    // Aktualizuj pozíciu
-    m_transformation.translation.setValue(dest);
+bool TurtleCommand::canBeExecutedOn(Controllable& c) /*override*/ {
+    return dynamic_cast<Turtle*>(&c) != nullptr;
 }
-
-void Turtle::jump(float x, float y) {
-    const ImVec2 pos = m_transformation.translation.getValueOrDef();
-    const ImVec2 dest(x, y);
-    m_path.push_back(ImVec4(pos.x, pos.y, dest.x, dest.y));
-    m_transformation.translation.setValue(dest);
+CommandMove::CommandMove(float d):m_d(d){}
+void CommandMove::executeOnTurtle(Turtle& t){t.move(m_d);}
+std::string CommandMove::toString(){ return "Move "+std::to_string(m_d); }
+CommandJump::CommandJump(float x,float y):m_x(x),m_y(y){}
+void CommandJump::executeOnTurtle(Turtle& t){t.jump(m_x,m_y);}
+std::string CommandJump::toString(){ return "Jump "+std::to_string(m_x)+", "+std::to_string(m_y); }
+CommandRotate::CommandRotate(float a):m_a(a){}
+void CommandRotate::executeOnTurtle(Turtle& t){t.rotate(m_a);}
+std::string CommandRotate::toString(){ return "Rotate "+std::to_string(m_a); }
 }
-
-void Turtle::rotate(float angleRad) {
-    // Set absolute rotation (in radians) for the turtle image.
-    // The drawing code (friimgui::Image::draw) will use this value
-    // when rotating the image region.
-    m_transformation.rotation.setValue(angleRad);
-}
-
-} // namespace turtlepreter

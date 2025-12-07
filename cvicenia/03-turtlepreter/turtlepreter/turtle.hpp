@@ -1,50 +1,61 @@
 #ifndef TURTLEPRETER_TURTLE_HPP
 #define TURTLEPRETER_TURTLE_HPP
 
-#include "libfriimgui/image.hpp"
-#include "libfriimgui/types.hpp"
-
+#include "controllable.hpp"
+#include "interpreter.hpp"
+#include "perk.hpp"
 #include <vector>
-#include <string>
 
 namespace turtlepreter {
-
-class Turtle {
+    class ICommand;
+    
+class Turtle : virtual public Controllable {
 public:
-    Turtle(const std::string &imgPath);
-    Turtle(const std::string &imgPath, float centerX, float centerY);
-
-    void draw(const friimgui::Region &region);
-
-    /**
-     * Odstráni históriu pohybu a vráti korytnačku na pôvodné miesto
-     * s pôvodným natočením.
-     */
-    void reset();
-
-    /**
-     * Posunie korytnačku o @p distance v smere jej natočenia.
-     */
-    void move(float distance);
-
-    /**
-     * Presunie korytnačku na súradnice @p x @p y
-     */
+    Turtle(const std::string& imgPath, float centerX, float centerY);
+    void draw(const friimgui::Region& region) override;
+    void reset() override;
+    void move(float d);
     void jump(float x, float y);
-
-    /**
-     * Zmení natočenie korytnačky na @p angleRad
-     */
-    void rotate(float angleRad);
-
+    void rotate(float a); // zváž relatívne otáčanie
 private:
-    friimgui::Transformation m_transformation;
-    friimgui::Image m_image;
     std::vector<ImVec4> m_path;
-    float m_initAngle = 0.f;
-    ImVec2 m_initPos = {0.f, 0.f};
 };
 
-} // namespace turtlepreter
 
+class Tortoise : public Turtle, public Runner {
+public:
+    Tortoise(const std::string& imgPath, float centerX, float centerY);
+    void reset() override;
+};
+
+
+class TurtleCommand : public ICommand {
+public:
+    void execute(Controllable& c) /*final*/ override;          // pridaj override/final
+    bool canBeExecutedOn(Controllable& c) override;            // názov podľa tvojho ICommand
+    virtual void executeOnTurtle(Turtle& t) = 0;
+};
+
+
+class CommandMove : public TurtleCommand {
+public:
+    explicit CommandMove(float d);
+    void executeOnTurtle(Turtle& t) override;
+    std::string toString() override;
+private:
+    float m_d;
+};
+
+class CommandJump : public TurtleCommand {
+public:
+    CommandJump(float x, float y);
+    void executeOnTurtle(Turtle& t) override;
+    std::string toString() override;
+private:
+    float m_x, m_y;
+};
+class CommandRotate : public TurtleCommand {
+public: CommandRotate(float a); void executeOnTurtle(Turtle &t) override; std::string toString() override; private: float m_a;
+};
+}
 #endif
