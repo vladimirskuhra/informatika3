@@ -7,6 +7,7 @@ target_sources(turtlepreter PRIVATE
     controllable.cpp
     perk.cpp
     main.cpp
+    config.cpp
 )
 
 target_compile_options(turtlepreter PRIVATE
@@ -16,7 +17,14 @@ target_compile_options(turtlepreter PRIVATE
     -std=c++20
 )
 
-target_link_libraries(turtlepreter PRIVATE friimgui heap)
+
+target_link_libraries(turtlepreter
+  PRIVATE
+    friimgui
+    heap
+    nlohmann_json
+)
+
 
 add_custom_command(
     TARGET turtlepreter POST_BUILD

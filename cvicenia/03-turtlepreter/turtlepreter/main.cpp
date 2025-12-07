@@ -1,5 +1,7 @@
 
 // main.cpp
+
+
 #include "interpreter.hpp"
 #include "turtle.hpp"
 #include "turtle_gui.hpp"
@@ -7,27 +9,35 @@
 #include <libfriimgui/window.hpp>
 #include <filesystem>
 #include <iostream>
-#include "heap_monitor.hpp"
+#include "config.hpp"          // všetky externé/systemové hlavičky pred týmto...
+#include "heap_monitor.hpp"    // ...až ÚPLNE NA KONIEC
 
-int main() {
+
+
+int main(int argc, const char* argv[]) {    // <- potrebuješ argc/argv v main
     namespace tp = turtlepreter;
 
-    const int   cWidth   = 1280;
-    const int   cHeight  = 720;
+    // 0) Konfigurácia – priama inicializácia
+    tp::Config cfg = tp::Config::createFromArgs(argc, argv);
+    // alebo
+    // auto cfg = tp::Config::createFromArgs(argc, argv);
+
+    cfg.print(std::cout);
+
+    const int   cWidth   = cfg.getWidth();
+    const int   cHeight  = cfg.getHeight();
     const float cCenterX = cWidth  / 2.0f;
     const float cCenterY = cHeight / 2.0f;
 
-    // 1) Inicializácia okna / backendu (pred obrázkami!)
     friimgui::Window* window = friimgui::Window::initializeWindow(cWidth, cHeight);
 
-    // 2) Working directory + cesty k assetom
-    std::cout << "cwd = " << std::filesystem::current_path().string() << "\n";
 
     
-    std::filesystem::path tortoiseP = std::filesystem::path("../resources/tortoise.png");
-    std::filesystem::path runnerP   = std::filesystem::path("../resources/runner.png");
-    std::filesystem::path swimmerP  = std::filesystem::path("../resources/swimmer.png");
+    std::cout << "cwd = " << std::filesystem::current_path().string() << "\n";
 
+    std::filesystem::path tortoiseP = cfg.getImageTortoise();
+    std::filesystem::path runnerP   = cfg.getImageRunner();
+    std::filesystem::path swimmerP  = cfg.getImageSwimmer();
 
     bool ok = true;
     if (!std::filesystem::exists(tortoiseP)) { std::cerr << "Asset missing: " << tortoiseP << "\n"; ok = false; }
@@ -36,30 +46,26 @@ int main() {
     if (!ok) {
         friimgui::Window::releaseWindow();
         return 1;
-    }
 
-    // 3) Entitiy – teraz je backend pripravený
-    tp::Tortoise tortoise(tortoiseP.string(), cCenterX,        cCenterY);
+    }
+    
+    tp::Tortoise tortoise(tortoiseP.string(), cCenterX,         cCenterY);
     tp::Runner   runner(  runnerP.string(),   cCenterX - 150.f, cCenterY);
     tp::Swimmer  swimmer( swimmerP.string(),  cCenterX + 150.f, cCenterY);
 
-    // 4) Strom príkazov
     tp::Node* root = tp::Node::createSequentialNode();
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRotate(1.0f)));                    // TurtleCommand
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandMove(100.f)));                    // TurtleCommand
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRun(cCenterX, cCenterY + 120.f)));   // Runner
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandSwim(cCenterX, cCenterY - 120.f)));  // Swimmer
+    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRotate(1.0f)));
+    root->addSubnode(tp::Node::createLeafNode(new tp::CommandMove(100.f)));
+    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRun(cCenterX, cCenterY + 120.f)));
+    root->addSubnode(tp::Node::createLeafNode(new tp::CommandSwim(cCenterX, cCenterY - 120.f)));
 
     tp::Interpreter interpreter(root);
 
-    // 5) GUI – demo nad Tortoise (ak chceš prepínať, dorob tlačidlá v GUI)
     tp::TurtleGUI gui(&tortoise, &interpreter);
     window->setGUI(&gui);
 
-    // 6) Run loop
     window->run();
 
-    // 7) Cleanup
     delete root;
     friimgui::Window::releaseWindow();
     return 0;
