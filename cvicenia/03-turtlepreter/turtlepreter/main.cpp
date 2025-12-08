@@ -1,72 +1,62 @@
-
-// main.cpp
-
-
 #include "interpreter.hpp"
 #include "turtle.hpp"
 #include "turtle_gui.hpp"
-#include "perk.hpp"
+
 #include <libfriimgui/window.hpp>
-#include <filesystem>
+
+#include <imgui/imgui.h>
+
 #include <iostream>
-#include "config.hpp"          // všetky externé/systemové hlavičky pred týmto...
-#include "heap_monitor.hpp"    // ...až ÚPLNE NA KONIEC
 
+#include "heap_monitor.hpp"
 
-
-int main(int argc, const char* argv[]) {    // <- potrebuješ argc/argv v main
+int main() {
     namespace tp = turtlepreter;
 
-    // 0) Konfigurácia – priama inicializácia
-    tp::Config cfg = tp::Config::createFromArgs(argc, argv);
-    // alebo
-    // auto cfg = tp::Config::createFromArgs(argc, argv);
+    const int cCenterX = 320;
+    const int cCenterY = 320;
 
-    cfg.print(std::cout);
+    friimgui::Window *window = friimgui::Window::initializeWindow(1024, 720);
 
-    const int   cWidth   = cfg.getWidth();
-    const int   cHeight  = cfg.getHeight();
-    const float cCenterX = cWidth  / 2.0f;
-    const float cCenterY = cHeight / 2.0f;
+    tp::Turtle turtle("turtlepreter/resources/turtle.png", cCenterX, cCenterY);
 
-    friimgui::Window* window = friimgui::Window::initializeWindow(cWidth, cHeight);
+    tp::CommandJump cmdJump1(cCenterX, cCenterY - 100);
+    tp::CommandSetColor cmdColor(ImColor(255, 0, 0));
+    tp::CommandJump cmdJump2(cCenterX - 100, cCenterY - 100);
+    tp::CommandJump cmdJump3(cCenterX - 100, cCenterY);
+    tp::CommandRotate cmdRotate(1.57);
 
+    cmdJump1.log(std::cout);
+    cmdColor.log(std::cout);
+    cmdJump2.log(std::cout);
+    cmdJump3.log(std::cout);
+    cmdRotate.log(std::cout);
 
-    
-    std::cout << "cwd = " << std::filesystem::current_path().string() << "\n";
+    tp::Node *nodeRoot = tp::Node::createSequentialNode();
+    tp::Node *nodeJump1 = tp::Node::createLeafNode(&cmdJump1);
+    tp::Node *nodeColor = tp::Node::createLeafNode(&cmdColor);
+    tp::Node *nodeJump2 = tp::Node::createLeafNode(&cmdJump2);
+    tp::Node *nodeJump3 = tp::Node::createLeafNode(&cmdJump3);
+    tp::Node *nodeRotate = tp::Node::createLeafNode(&cmdRotate);
 
-    std::filesystem::path tortoiseP = cfg.getImageTortoise();
-    std::filesystem::path runnerP   = cfg.getImageRunner();
-    std::filesystem::path swimmerP  = cfg.getImageSwimmer();
+    nodeRoot->addSubnode(nodeJump1);
+    nodeRoot->addSubnode(nodeColor);
+    nodeRoot->addSubnode(nodeJump2);
+    nodeRoot->addSubnode(nodeJump3);
+    nodeRoot->addSubnode(nodeRotate);
 
-    bool ok = true;
-    if (!std::filesystem::exists(tortoiseP)) { std::cerr << "Asset missing: " << tortoiseP << "\n"; ok = false; }
-    if (!std::filesystem::exists(runnerP))   { std::cerr << "Asset missing: " << runnerP   << "\n"; ok = false; }
-    if (!std::filesystem::exists(swimmerP))  { std::cerr << "Asset missing: " << swimmerP  << "\n"; ok = false; }
-    if (!ok) {
-        friimgui::Window::releaseWindow();
-        return 1;
+    tp::Interpreter interpreter(nodeRoot);
+    tp::TurtleGUI turtleGUI(&turtle, &interpreter);
 
-    }
-    
-    tp::Tortoise tortoise(tortoiseP.string(), cCenterX,         cCenterY);
-    tp::Runner   runner(  runnerP.string(),   cCenterX - 150.f, cCenterY);
-    tp::Swimmer  swimmer( swimmerP.string(),  cCenterX + 150.f, cCenterY);
-
-    tp::Node* root = tp::Node::createSequentialNode();
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRotate(1.0f)));
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandMove(100.f)));
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandRun(cCenterX, cCenterY + 120.f)));
-    root->addSubnode(tp::Node::createLeafNode(new tp::CommandSwim(cCenterX, cCenterY - 120.f)));
-
-    tp::Interpreter interpreter(root);
-
-    tp::TurtleGUI gui(&tortoise, &interpreter);
-    window->setGUI(&gui);
-
+    window->setGUI(&turtleGUI);
     window->run();
-
-    delete root;
     friimgui::Window::releaseWindow();
-    return 0;
+
+    if (turtle.getPathSegmentCount() ) {
+        (void)turtle.getPathSegmentPoints(0);
+        (void)turtle.getPathSegmentColor(0);
+        turtle.setColor(ImColor(0,0,0));
+    }
+
+    delete nodeRoot;
 }

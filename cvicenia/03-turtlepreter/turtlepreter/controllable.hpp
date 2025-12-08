@@ -9,7 +9,7 @@ namespace turtlepreter {
 
 class Controllable {
 public:
-    // Bez default ctoru – chceme mať vždy platný Image
+    
     explicit Controllable(const std::string& imgPath);
     Controllable(const std::string& imgPath, float centerX, float centerY);
 
@@ -20,8 +20,8 @@ public:
     friimgui::Transformation& getTransformation();
 
 protected:
-    friimgui::Transformation m_transformation; // bez {} – má default ctor
-    friimgui::Image m_image;                   // bez {} – init v ctor inicializačnom zozname
+    friimgui::Transformation m_transformation; 
+    friimgui::Image m_image;                  
     ImVec2 m_initPos{0.f, 0.f};
     float m_initAngle{0.f};
 };

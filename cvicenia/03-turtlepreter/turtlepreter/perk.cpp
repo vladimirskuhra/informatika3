@@ -4,7 +4,7 @@
 namespace turtlepreter {
 
 Perk::Perk(const std::string& imgPath, float cX, float cY, int fullStat)
-    : Controllable(imgPath, cX, cY)  // <-- Dôležité!
+    : Controllable(imgPath, cX, cY)
     , m_stat(fullStat)
     , m_fullStat(fullStat) {}
 
@@ -18,13 +18,12 @@ void Perk::reset() {
 
 
 Runner::Runner(const std::string& i, float cX, float cY)
-    : Controllable(i, cX, cY)         // virtual base sa aj tak použije z most-derived
-    , Perk(i, cX, cY, /*fullStamina=*/5) {}
+    : Controllable(i, cX, cY)
+    , Perk(i, cX, cY, 5) {}
 
 Swimmer::Swimmer(const std::string& i, float cX, float cY)
     : Controllable(i, cX, cY)
-    , Perk(i, cX, cY, /*fullOxygen=*/10) {}
-
+    , Perk(i, cX, cY, 10) {}
 
 
 CommandRun::CommandRun(float x, float y) : m_x(x), m_y(y) {}
@@ -65,4 +64,4 @@ std::string CommandSwim::toString() {
     return "Swim " + std::to_string(m_x) + ", " + std::to_string(m_y);
 }
 
-}
+} // namespace turtlepreter
