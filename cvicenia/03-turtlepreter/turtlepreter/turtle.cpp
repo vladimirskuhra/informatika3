@@ -154,11 +154,6 @@ std::string CommandSetColor::toString() {
     return "SetColor";
 }
 
-void CommandSetColor::log(std::ostream& ost) const {
-    const ImVec4 v = m_color.Value; // komponenty 0..1
-    ost << "setColor(" << v.x << "," << v.y << "," << v.z << ")\n";
-}
-
 void CommandSetColor::log(std::ostream &os) const
 {
     os << "setColor(" << m_color.Value.x << ", " << m_color.Value.y << ", " << m_color.Value.z << ", " << m_color.Value.w << ")\n";

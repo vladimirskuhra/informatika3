@@ -1,5 +1,5 @@
 
-// config.hpp
+
 #pragma once
 #include <string>
 #include <filesystem>
@@ -11,7 +11,7 @@ namespace turtlepreter {
 class Config {
 public:
     static Config createDefault();
-    static Config createFromArgs(int argc, const char* argv[]);             // voliteľné
+    static Config createFromArgs(int argc, const char* argv[]);             
     static Config createFromJsonNode(const nlohmann::json& node);
     static Config createFromJsonFile(const std::filesystem::path& path);
 

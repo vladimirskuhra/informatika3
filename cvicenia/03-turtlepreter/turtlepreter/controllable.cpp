@@ -7,7 +7,7 @@
 namespace turtlepreter {
 
 Controllable::Controllable(const std::string &imgPath)
-    : m_image(friimgui::Image::createImage(imgPath))  // <-- tu!
+    : m_image(friimgui::Image::createImage(imgPath))  
 {
     if (!std::filesystem::exists(imgPath)) {
         throw std::runtime_error("Asset neexistuje: " + imgPath);
@@ -19,7 +19,7 @@ Controllable::Controllable(const std::string &imgPath)
 }
 
 Controllable::Controllable(const std::string &imgPath, float centerX, float centerY)
-    : m_image(friimgui::Image::createImage(imgPath))  // <-- tu!
+    : m_image(friimgui::Image::createImage(imgPath))  
 {
     if (!std::filesystem::exists(imgPath)) {
         throw std::runtime_error("Asset neexistuje: " + imgPath);

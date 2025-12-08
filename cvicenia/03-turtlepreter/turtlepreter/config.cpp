@@ -1,5 +1,5 @@
 
-// config.cpp
+
 #include "config.hpp"
 #include <fstream>
 #include <stdexcept>
@@ -8,7 +8,7 @@ namespace turtlepreter {
 
 Config Config::createDefault() {
     Config cfg;
-    // hodnoty podľa zadania (ak chceš defaulty striktne)
+   
     cfg.m_imageTurtle   = "turtlepreter/resources/turtle.png";
     cfg.m_imageRunner   = "turtlepreter/resources/runner.png";
     cfg.m_imageSwimmer  = "turtlepreter/resources/swimmer.png";
@@ -20,7 +20,7 @@ Config Config::createDefault() {
 
 Config Config::createFromJsonNode(const nlohmann::json& node) {
     Config cfg;
-    // bezpečné čítanie s defaultmi
+    
     cfg.m_imageTurtle   = node.value("imageTurtle",   "turtlepreter/resources/turtle.png");
     cfg.m_imageRunner   = node.value("imageRunner",   "turtlepreter/resources/runner.png");
     cfg.m_imageSwimmer  = node.value("imageSwimmer",  "turtlepreter/resources/swimmer.png");
