@@ -48,8 +48,7 @@ public:
     bool canBeExecutedOn(Controllable& c) override;            
     virtual void executeOnTurtle(Turtle& t) = 0;
     virtual std::string toString() override = 0;
-    virtual void log(std::ostream &os) const override = 0;
-};
+    void log(std::ostream& ost) const override = 0;};
 
 
 class CommandMove : public TurtleCommand {

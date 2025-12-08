@@ -140,13 +140,78 @@ void Interpreter::interpretAll(Controllable& c) {
     }
 }
 
-void Interpreter::reset() { m_somethingExecuted = false; resetNodeCursors(m_root); if(m_current) m_current->setIsFocused(false); m_current = m_root; if(m_current) m_current->setIsFocused(true); if(!m_stopOnNodeWithoutCommand && m_current && !m_current->getCommand()) moveCurrent(); }
-void Interpreter::resetNodeCursors(Node* n) { if(!n) return; n->getCursor()->reset(); for(auto* s : n->getSubnodes()) resetNodeCursors(s); }
-bool Interpreter::isFinished() const { return m_current == nullptr; }
-bool Interpreter::wasSomethingExecuted() const { return m_somethingExecuted; }
-bool Interpreter::stopOnNodeWithoutCommand() const { return m_stopOnNodeWithoutCommand; }
-void Interpreter::setStopOnNodeWithoutCommand(bool v) { m_stopOnNodeWithoutCommand = v; }
-Node* Interpreter::getRoot() const { return m_root; }
-Node* Interpreter::getCurrent() const { return m_current; }
-void Interpreter::moveCurrent() { if(isFinished()) return; do { if(m_current) m_current->setIsFocused(false); m_current = m_current->getCursor()->next(); if(m_current) m_current->setIsFocused(true); } while(m_current && !m_stopOnNodeWithoutCommand && !m_current->getCommand()); }
+void Interpreter::reset() {
+    m_somethingExecuted = false;
+    resetNodeCursors(m_root);
+
+    if (m_current) {
+        m_current->setIsFocused(false);
+    }
+
+    m_current = m_root;
+
+    if (m_current) {
+        m_current->setIsFocused(true);
+    }
+
+    if (!m_stopOnNodeWithoutCommand && m_current && !m_current->getCommand()) {
+        moveCurrent();
+    }
+}
+
+void Interpreter::resetNodeCursors(Node *n) {
+    if (!n) return;
+    if (n->getCursor()) {
+        n->getCursor()->reset();
+    }
+    for (Node *s : n->getSubnodes()) {
+        resetNodeCursors(s);
+    }
+}
+
+bool Interpreter::isFinished() const {
+    return m_current == nullptr;
+}
+
+bool Interpreter::wasSomethingExecuted() const {
+    return m_somethingExecuted;
+}
+
+bool Interpreter::stopOnNodeWithoutCommand() const {
+    return m_stopOnNodeWithoutCommand;
+}
+
+void Interpreter::setStopOnNodeWithoutCommand(bool v) {
+    m_stopOnNodeWithoutCommand = v;
+}
+
+Node *Interpreter::getRoot() const {
+    return m_root;
+}
+
+Node *Interpreter::getCurrent() const {
+    return m_current;
+}
+
+void Interpreter::moveCurrent() {
+    if (isFinished()) return;
+
+    do {
+        if (m_current) {
+            m_current->setIsFocused(false);
+            if (m_current->getCursor()) {
+                m_current = m_current->getCursor()->next();
+            } else {
+                m_current = nullptr;
+            }
+        }
+        if (m_current) {
+            m_current->setIsFocused(true);
+        }
+    } while (
+        m_current &&
+        !m_stopOnNodeWithoutCommand &&
+        !m_current->getCommand()
+    );
+}
 } // namespace turtlepreter
